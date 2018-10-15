@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>		  
+<project basedir="." default="build" name="hw01">
+    <property environment="env"/>
+    <property name="junit.output.dir" value="junit"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.8"/>
+    <property name="source" value="1.8"/>
+
+		
+		<path id="JUnit 4.libraryclasspath">
+        <pathelement location="${env.HAMCREST_CORE_CS680}"/>
+        <pathelement location="${env.JUNIT_CS680}"/>
+		</path>
+	
+	    <path id="hw01.classpath">
+		<pathelement location="."/>
+		<pathelement location="bin"/>
+		<pathelement location="test/bin"/>
+		<path refid="JUnit 4.libraryclasspath"/>
+		</path>
+		<echo>---------------------------------ANT CLEAN-------------------------------------</echo>
+		<target name="clean">
+        <delete dir="bin"/>
+		<delete dir="test/bin"/>
+	
+		</target>
+	
+    
+	
+    <target name="init" depends ="clean">
+    	<echo>---------------------------------INIT-------------------------------------</echo>
+    
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.launch"/> 
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+
+		<mkdir dir="test/bin"/>
+        <copy includeemptydirs="false" todir="test/bin">
+            <fileset dir="test/src">
+                <exclude name="**/*.launch"/>  
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+	
+ 
+	<target depends="clean" name="cleanall"/>
+    <target depends="build-project,CalculatorTest" name="build"/>
+    <target name="build-subprojects"/>
+    <target depends="init" name="build-project">
+    	<echo>---------------------------------BUILD-------------------------------------</echo>
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src"/>
+        </javac>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="test/bin" includeantruntime="false" source="${source}" target="${target}">
+            <src path="test/src"/>
+            <classpath refid="hw01.classpath"/>
+     
+        </javac>
+    </target>
+	
+	
+   <target name="CalculatorTest">
+   	<echo>---------------------------------CALCULATOR TEST-------------------------------------</echo>
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="edu.umb.cs.cs680.hw01.CalculatorTest" todir="${junit.output.dir}"/>
+            <jvmarg line="-ea"/>
+            <classpath refid="hw01.classpath"/>
+        </junit>
+    </target>
+	
+    <target name="hw01">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="edu.umb.cs.cs680.hw01.CalculatorTest" todir="${junit.output.dir}"/>
+            <jvmarg line="-ea"/>
+            <classpath refid="hw01.classpath"/>
+        </junit>
+    </target>
+	
+</project>

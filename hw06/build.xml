@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." xmlns:jacoco="antlib:org.jacoco.ant" default="build" name="hw06">
+    <property environment="env"/>
+    <property name="junit.output.dir" value="${basedir}/test/report/junit"/>
+	<property name="jacoco.output.dir" value="${basedir}/test/report/coverage"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="9"/>
+    <property name="source" value="9"/>
+    <path id="hw06.classpath">
+        <pathelement location="bin"/>
+        <pathelement location="test/bin"/>
+        <pathelement location="${env.HAMCREST_CORE_CS680}"/>
+        <pathelement location="${env.JUNIT_CS680}"/>
+    	<pathelement location="${env.JACOCO}"/>
+    </path>
+	
+	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+	    <classpath path="${env.JACOCO}"/>
+	  </taskdef>
+	
+    <path id="run.hw06.classpath">
+        <path refid="hw06.classpath"/>
+        <pathelement location="${env.HAMCREST_CORE_CS680}"/>
+        <pathelement location="${env.JUNIT_CS680}"/>
+    </path>
+        <path id="run.CarTest.classpath">
+        <path refid="hw06.classpath"/>
+        <pathelement location="${env.HAMCREST_CORE_CS680}"/>
+        <pathelement location="${env.JUNIT_CS680}"/>
+    </path>
+    <path id="run.JUnitCore.classpath">
+        <path refid="hw06.classpath"/>
+        <pathelement location="${env.HAMCREST_CORE_CS680}"/>
+        <pathelement location="${env.JUNIT_CS680}"/>
+    </path>
+    
+	<target name="init" depends = "clean">
+    	<echo>---------------------------------INIT-------------------------------------</echo>
+        <mkdir dir="bin"/>
+        <mkdir dir="test/bin"/>
+		<mkdir dir="${junit.output.dir}"/>
+		<mkdir dir="${jacoco.output.dir}"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+        <copy includeemptydirs="false" todir="test/bin">
+            <fileset dir="test/src">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+	
+    <target name="clean">
+    	<echo>---------------------------------ANT CLEAN-------------------------------------</echo>
+        <delete dir="bin"/>
+        <delete dir="test/bin"/>
+    	<delete dir="${junit.output.dir}"/>
+    	<delete dir="${jacoco.output.dir}"/>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-subprojects,build-project,CarTest,UnitTestReport,CoverageReport" name="build"/>
+    <target name="build-subprojects"/>
+    <target depends="init" name="build-project">
+    	<echo>---------------------------------BUILD-------------------------------------</echo>
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="hw06.classpath"/>
+        </javac>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="test/bin" includeantruntime="false" source="${source}" target="${target}">
+            <src path="test/src"/>
+            <classpath refid="hw06.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target name="hw06">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="edu.umb.cs.cs680.hw06.CarTest" todir="${junit.output.dir}"/>
+            <jvmarg line="-ea"/>
+            <classpath refid="run.hw06.classpath"/>
+        </junit>
+    </target>
+	
+	<target name="CarTest">
+	    	<echo>---------------------------------CAR TEST-------------------------------------</echo>
+	        <mkdir dir="${junit.output.dir}"/>
+			<jacoco:coverage destfile="${jacoco.output.dir}/jacoco.exec">
+	        <junit fork="yes" printsummary="withOutAndErr">
+	            <formatter type="xml"/>
+	            <test name="edu.umb.cs.cs680.hw06.CarTest" todir="${junit.output.dir}"/>
+	            <jvmarg line="-ea"/>
+	            <classpath refid="run.CarTest.classpath"/>
+	        </junit>
+		</jacoco:coverage>
+	</target>
+	
+    <target name ="UnitTestReport">
+    	<echo>---------------------------------UNIT TEST REPORT GENERATED-------------------------------------</echo>
+    	<echo/>
+        <junitreport todir="${junit.output.dir}">
+            <fileset dir="${junit.output.dir}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="${junit.output.dir}"/>
+        </junitreport>
+	</target>
+	
+	<target name = "CoverageReport">
+		<echo>---------------------------------COVERAGE REPORT GENERATED-------------------------------------</echo>
+		<echo/>
+	 <jacoco:report>
+	      <executiondata>
+	        <file file="${jacoco.output.dir}/jacoco.exec"/>
+	      </executiondata>
+
+	      <structure name="JaCoCo Ant">
+	        <classfiles>
+	          <fileset dir="bin"/>
+	        </classfiles>
+	        <sourcefiles encoding="UTF-8">
+	          <fileset dir="src"/>
+	        </sourcefiles>
+	      </structure>
+	      <!--  to produce reports in different formats.  -->
+	      <html destdir="${jacoco.output.dir}"/>
+	      <csv destfile="${jacoco.output.dir}/report.csv"/>
+	      <xml destfile="${jacoco.output.dir}/report.xml"/>
+	    </jacoco:report>
+	  </target>
+</project>

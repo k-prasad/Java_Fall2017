@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="build" name="hw02">
+    <property environment="env"/>
+    <property name="junit.output.dir" value="junit"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="9"/>
+    <property name="source" value="9"/>
+    <path id="hw02.classpath">
+        <pathelement location="bin"/>
+        <pathelement location="test/bin"/>
+        <pathelement location="${env.HAMCREST_CORE_CS680}"/>
+        <pathelement location="${env.JUNIT_CS680}"/>
+    </path>
+    <path id="run.hw02.classpath">
+        <path refid="hw02.classpath"/>
+        <pathelement location="${env.HAMCREST_CORE_CS680}"/>
+        <pathelement location="${env.JUNIT_CS680}"/>
+    </path>
+    <path id="run.DVDPlayerTest.classpath">
+        <path refid="hw02.classpath"/>
+        <pathelement location="${env.HAMCREST_CORE_CS680}"/>
+        <pathelement location="${env.JUNIT_CS680}"/>
+    </path>
+    <path id="run.JUnitCore.classpath">
+        <path refid="hw02.classpath"/>
+        <pathelement location="${env.HAMCREST_CORE_CS680}"/>
+        <pathelement location="${env.JUNIT_CS680}"/>
+    </path>
+	
+    <target name="init" depends = "clean"> 
+    	<echo>---------------------------------INIT-------------------------------------</echo>
+        <mkdir dir="bin"/>
+        <mkdir dir="test/bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+        <copy includeemptydirs="false" todir="test/bin">
+            <fileset dir="test/src">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+	
+	
+    <target name="clean">
+    <echo>---------------------------------ANT CLEAN-------------------------------------</echo>
+        <delete dir="bin"/>
+        <delete dir="test/bin"/>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-subprojects,build-project,DVDPlayerTest" name="build"/>
+    <target name="build-subprojects"/>
+    <target depends="init" name="build-project">
+    	
+    	<echo>---------------------------------BUILD-------------------------------------</echo>
+    	
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="hw02.classpath"/>
+        </javac>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="test/bin" includeantruntime="false" source="${source}" target="${target}">
+            <src path="test/src"/>
+            <classpath refid="hw02.classpath"/>
+        </javac>
+    </target>
+	
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target name="hw02">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="edu.umb.cs.cs680.hw02.DVDPlayerTest" todir="${junit.output.dir}"/>
+            <jvmarg line="-ea"/>
+            <classpath refid="run.hw02.classpath"/>
+        </junit>
+    </target>
+	
+    <target name="DVDPlayerTest">
+    	<echo>---------------------------------DVD PLAYER TEST-------------------------------------</echo>
+        <mkdir dir="${junit.output.dir}"/>
+    	
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="edu.umb.cs.cs680.hw02.DVDPlayerTest" todir="${junit.output.dir}"/>
+            <jvmarg line="-ea"/>
+            <classpath refid="run.DVDPlayerTest.classpath"/>
+        </junit>
+    </target>
+	
+    <target name="JUnitCore">
+        <java classname="org.junit.runner.JUnitCore" failonerror="true" fork="yes">
+            <classpath refid="run.JUnitCore.classpath"/>
+        </java>
+    </target>
+	
+    <target name="junitreport">
+        <junitreport todir="${junit.output.dir}">
+            <fileset dir="${junit.output.dir}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="${junit.output.dir}"/>
+        </junitreport>
+    </target>
+</project>
